@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>訂單管理</title>
+	<!-- 引入 jQuery -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<link href="../css/styles.css" rel="stylesheet" />
+	<!-- Bootstrap JavaScript -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+	<style>
+		h1 {
+			margin-top: 200px;
+			text-align: center;
+			margin-bottom: 20px;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 20px;
+		}
+
+		table,
+		th,
+		td {
+			border: 1px solid #ccc;
+			text-align: left;
+			padding: 8px;
+		}
+
+		#editModal {
+			display: none;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background-color: #fff;
+			border: 1px solid #ccc;
+			padding: 20px;
+		}
+
+		#editModal label {
+			display: block;
+			margin: 10px 0;
+		}
+
+		.deleteButton {
+			background-color: red;
+			color: white;
+			border: none;
+			padding: 5px 10px;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		.deleteButton:hover {
+			background-color: darkred;
+		}
+
+		.updateButton {
+			background-color: teal;
+			color: white;
+			border: none;
+			padding: 5px 10px;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		.updateButton:hover {
+			filter: brightness(1.2);
+		}
+
+		#searchBox {
+			margin-right: 10px;
+		}
+
+		button {
+			padding: 10px 20px;
+			/* 內部間距 */
+			font-size: 16px;
+			font-weight: bold;
+			border-radius: 8px;
+			/* 邊框圓角 */
+			border: none;
+			/* 移除邊框 */
+			cursor: pointer;
+			/* 滑鼠指標變成手形 */
+			transition: background-color 0.3s, box-shadow 0.3s;
+			/* 動畫效果 */
+		}
+
+		/* 查詢全部按鈕 */
+		#getAllButton {
+			background-color: #4CAF50;
+			color: white;
+			/* 白色文字 */
+		}
+
+		#getAllButton:hover {
+			background-color: #45a049;
+			/* 懸停時改變顏色 */
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			/* 懸停時增加陰影 */
+		}
+
+		/* 新增訂單按鈕 */
+		#addButton {
+			background-color: #9E9E9E;
+			/* 灰色背景 */
+			color: white;
+			/* 白色文字 */
+		}
+
+		#addButton:hover {
+			background-color: #FF5757;
+			;
+			/* 懸停時改變顏色 */
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			/* 懸停時增加陰影 */
+		}
+
+		/* 搜尋按鈕 */
+		#searchButton {
+			background-color: #2196F3;
+			/* 藍色背景 */
+			color: white;
+			/* 白色文字 */
+		}
+
+		#searchButton:hover {
+			background-color: #1976D2;
+			/* 懸停時改變顏色 */
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			/* 懸停時增加陰影 */
+		}
+	</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+		<div class="container">
+			<img src="../picture/logo.png" alt="首頁圖片" class="logoImg"> <a class="navbar-brand" href="#page-top">心護家</a>
+			<button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+				aria-expanded="false" aria-label="Toggle navigation">
+				Menu <i class="fas fa-bars"></i>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+							href="#portfolio">會員功能</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+							href="#about">看護功能</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+							href="#contact">預約功能</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+							href="#contact">訂單功能</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+							href="#contact">活動功能</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded"
+							href="#contact">文章功能</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<h1>訂單管理</h1>
+
+	<!-- 搜尋框和新增按鈕 -->
+	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+		<!-- 左側：新增按鈕 -->
+		<div style="padding: 20px;">
+			<button id="addButton">新增訂單</button>
+		</div>
+		<!-- 右側：搜尋框和查詢按鈕 -->
+		<div>
+			<input type="text" id="searchBox" placeholder="搜尋客戶ID">
+			<button id="searchButton">搜尋</button>
+			<button id="getAllButton">查詢全部</button>
+		</div>
+	</div>
+
+	<!-- 訂單表格 -->
+	<table>
+		<thead>
+			<tr>
+				<th>訂單編號</th>
+				<th>客戶編號</th>
+				<th>看護編號</th>
+				<th>訂單日期</th>
+				<th>開始日期</th>
+				<th>結束日期</th>
+				<th>狀態</th>
+				<th>總價</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody id="orderTableBody">
+			<!-- 動態生成訂單內容 -->
+		</tbody>
+	</table>
+
+	<!-- 編輯彈窗 -->
+	<div id="editModal">
+		<h2 id="modalTitle">編輯訂單</h2>
+		<form id="editForm">
+			<input type="hidden" id="editOrderId"> <label>客戶編號: <input type="text" id="editCustomerId"></label>
+			<label>看護編號: <input type="text" id="editCaregiverId"></label> <label>訂單日期: <input type="date"
+					id="editOrderDate"></label> <label>開始日期: <input type="date" id="editStartDate"></label> <label>結束日期:
+				<input type="date" id="editEndDate"></label> <label>狀態: <select id="editStatus">
+					<option value="完成">完成</option>
+					<option value="進行中">進行中</option>
+					<option value="已取消">已取消</option>
+				</select>
+			</label> <label>總價: <input type="number" id="editTotalPrice"></label>
+			<button type="button" id="saveButton">儲存</button>
+			<button type="button" id="cancelButton">取消</button>
+		</form>
+	</div>
+
+	<script>
+		$(document)
+			.ready(
+				function () {
+					let isEditMode = false; // 用來標識是否處於編輯模式
+					loadOrders(); // 頁面加載時呼叫
+					//呼叫查詢全部
+					function loadOrders() {
+						$.ajax({
+							url: '/Order/GetAllOrder', //  GetAllOrderServlet 路徑
+							method: 'GET',
+							success: function (data) {
+								$('#orderTableBody').html(data); // 將 Servlet 回傳的 HTML 插入到表格
+
+							},
+							error: function (xhr, status, error) {
+								console.error("Error loading orders:",
+									error);
+							}
+						});
+					}
+					//新增 新增按鈕事件
+					$('#addButton').click(function () {
+						isEditMode = false; // 設定為新增模式
+						$('#modalTitle').text('新增訂單');
+						$('#editForm')[0].reset(); // 清空表單
+						$('#editOrderId').val(''); // 清空隱藏的訂單 ID
+						$('#editOrderIdDisplay').text(''); // 清空顯示的訂單 ID
+						$('#editModal').show();
+					});
+					// 編輯訂單
+					$('#orderTableBody').on('click', '.updateButton',
+						function () {
+							isEditMode = true; // 設定為編輯模式
+							$('#modalTitle').text('編輯訂單');
+							let orderId = $(this).data('orderid');
+							// 直接使用訂單ID來編輯，不用再呼叫 GetOrderByOrderId 來查詢訂單資料
+							$('#editOrderId').val(orderId); // 設定隱藏的訂單 ID
+							$('#editOrderIdDisplay').text(orderId); // 顯示訂單 ID
+							// 開啟編輯彈窗
+							$('#editModal').show();
+							console.log('Orderid');
+						});
+
+					// 儲存按鈕
+					$('#saveButton')
+						.click(
+							function () {
+								let url = isEditMode ? '/Order/UpdateOrderByOrderId'
+									: '/Order/InsertOrder';
+								let orderData = {
+									orderId: $('#editOrderId')
+										.val(),
+									customerId: $(
+										'#editCustomerId')
+										.val(),
+									caregiverId: $(
+										'#editCaregiverId')
+										.val(),
+									orderDate: $(
+										'#editOrderDate')
+										.val(),
+									startDate: $(
+										'#editStartDate')
+										.val(),
+									endDate: $('#editEndDate')
+										.val(),
+									status: $('#editStatus')
+										.val(),
+									totalPrice: $(
+										'#editTotalPrice')
+										.val()
+								};
+								console.log(orderData);
+
+								$
+									.ajax({
+										url: url,
+										method: 'GET',
+										data: orderData,
+										success: function () {
+											alert(isEditMode ? '訂單更新成功'
+												: '訂單新增成功');
+											$('#editModal')
+												.hide();
+											loadOrders();
+										},
+										error: function () {
+											alert(isEditMode ? '訂單更新失敗'
+												: '訂單新增失敗');
+										}
+									});
+							});
+
+					// 取消按鈕
+					$('#cancelButton').click(function () {
+						$('#editModal').hide();
+					});
+
+					// 				//新增
+					// 				$.ajax({
+					// 					url : '/Order/InsertOrder', // 插入訂單的Servlet路徑
+					// 					method : 'POST',
+					// 					data : {
+					// 						customerId : customerId,
+					// 						caregiverId : caregiverId,
+					// 						orderDate : orderDate,
+					// 						startDate : startDate,
+					// 						endDate : endDate,
+					// 						status : status,
+					// 						totalPrice : totalPrice
+					// 					},
+					// 					success : function(response) {
+					// 						alert('訂單新增成功');
+					// 						$('#editModal').hide(); // 隱藏彈窗
+					// 						loadOrders(); // 重新載入訂單列表
+					// 					},
+					// 					error : function(xhr, status, error) {
+					// 						console.error("Error inserting order:", error);
+					// 						alert('訂單新增失敗');
+					// 					}
+					// 				});
+					// 			});
+
+					// 取消新增訂單
+					$('#cancelButton').click(function () {
+						$('#editModal').hide(); // 隱藏彈窗
+					});
+					// 當按下 Enter 鍵時觸發事件
+					$('#searchBox').keypress(function (e) {
+						// 如果按下的是 Enter 鍵（keyCode 13）
+						if (e.which == 13) {
+							let customerId = $('#searchBox').val(); // 獲取顧客ID
+							if (customerId) {
+								searchOrdersByCustomerId(customerId); // 有文字時，執行搜尋
+							} else {
+								loadOrders(); // 沒有文字時，執行查詢全部
+							}
+						}
+					});
+					//根據顧客ID搜尋 設定按鈕事件
+					$('#searchButton').click(function () {
+						let customerId = $('#searchBox').val(); // 獲取顧客ID
+						if (customerId) {
+							searchOrdersByCustomerId(customerId); // 搜尋訂單
+						}
+					});
+
+					// 根據顧客ID搜尋訂單
+					function searchOrdersByCustomerId(customerId) {
+						$.ajax({
+							url: '/Order/GetOrderByCustomerId', // 這是查詢顧客訂單的Servlet路徑
+							method: 'GET',
+							data: {
+								customerId: customerId
+							},
+							success: function (data) {
+								$('#orderTableBody').html(data); // 將查詢結果插入表格
+								// 這裡確保動態插入的按鈕也能正確綁定事件
+								bindButtonEvents(); // 重新綁定事件
+							},
+							error: function (xhr, status, error) {
+								console.error("Error loading orders:",
+									error);
+							}
+						});
+					}
+					// 重新綁定編輯和刪除按鈕的事件
+					function bindButtonEvents() {
+						// 編輯按鈕事件
+						$('.editButton').each(function () {
+							$(this).off('click').on('click', function () {
+								var orderId = $(this).data('orderid');
+								window.location.href = "editOrderServlet?orderid=" + orderId; // 根據orderid導向編輯頁面
+							});
+						});
+
+						// 刪除按鈕事件
+						$('.deleteButton').each(function () {
+							$(this).off('click').on('click', function () {
+								var orderId = $(this).data('orderid');
+								if (confirm("確定刪除訂單 " + orderId + " 嗎？")) {
+									// 呼叫刪除操作
+									deleteOrder(orderId); // 呼叫刪除函數
+								}
+							});
+						});
+					}
+
+					// 查詢全部按鈕
+					$('#getAllButton').click(function () {
+						loadOrders();
+					});
+					//刪除
+					$('#orderTableBody')
+						.on(
+							'click',
+							'.deleteButton',
+							function () {
+								let orderId = $(this).data(
+									'orderid'); // 確保小寫 'orderid'
+								let id = document
+									.querySelector(".deleteButton");
+								console.log(orderId); // 檢查是否能正確獲取值
+								deleteOrder(orderId);
+								//let orderId = $(this).attr('data-orderid'); // 使用 .attr() 嘗試
+								//console.log("123");
+							});
+
+					//刪除訂單
+					function deleteOrder(orderId) {
+						if (confirm('確定要刪除此訂單嗎？')) {
+							$
+								.ajax({
+									url: '/Order/DeleteOrderByOrderId?orderId='
+										+ orderId,
+									method: 'GET',
+
+									success: function (response) {
+										loadOrders();
+										alert('你刪除的是訂單編號是='
+											+ orderId);
+
+									},
+									error: function (xhr, status,
+										error) {
+										console
+											.error(
+												"Error deleting order:",
+												error);
+										alert('你刪除的是訂單編號是='
+											+ orderId);
+
+									}
+								});
+						}
+					}
+
+				});
+	</script>
+</body>
+
+</html>

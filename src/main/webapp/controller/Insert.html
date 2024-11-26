@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>新增訂單</title>
+</head>
+<body style="background-color:#fdf5e6">
+    <div align="center">
+        <h2>新增訂單</h2>
+        <form action="/Order/InsertOrder" method="post">
+            <table>
+                <tr>
+                    <td align="right">輸入顧客 ID :</td>
+                    <td><input type="text" name="customerId" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td align="right">輸入看護 ID :</td>
+                    <td><input type="text" name="caregiverId" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td align="right">輸入訂單日期 :</td>
+                    <td><input type="date" name="orderDate" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td align="right">輸入開始日期 :</td>
+                    <td><input type="date" name="startDate" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td align="right">輸入結束日期 :</td>
+                    <td><input type="date" name="endDate" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td align="right">輸入狀態 :</td>
+                    <td><input type="text" name="status" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td align="right">輸入總金額 :</td>
+                    <td><input type="text" name="totalPrice" style="width: 200px;" required /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center" style="padding-top: 10px;">
+                        <input type="submit" value="確定" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+</html>

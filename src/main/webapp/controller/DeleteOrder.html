@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Delete Order</title>
+</head>
+<body style="background-color:#fdf5e6">
+<div align="center">
+<h2>刪除訂單</h2>
+<form method="post" action="/Order/DeleteOrderByOrderId"> <!-- 與 Servlet 路徑一致 -->
+    輸入訂單 ID : <input type="text" name="orderId" required /><p>
+    <input type="submit" value="刪除" />
+</form>
+</div>
+</body>
+</html>
